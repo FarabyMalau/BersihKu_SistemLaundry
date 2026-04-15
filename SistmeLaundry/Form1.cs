@@ -72,3 +72,9 @@ namespace SistmeLaundry
                     MessageBox.Show("Data belum lengkap");
                     return;
                 }
+
+                string query = @"
+                INSERT INTO Transaksi
+                (Nama_Kasir, Nama_Pelanggan, Kode_Paket, Berat, Total_Harga, Status_Laundry)
+                VALUES
+                (@kasir, @pelanggan, @paket, @berat, @total, @status)";
