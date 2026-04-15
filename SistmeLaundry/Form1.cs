@@ -78,3 +78,9 @@ namespace SistmeLaundry
                 (Nama_Kasir, Nama_Pelanggan, Kode_Paket, Berat, Total_Harga, Status_Laundry)
                 VALUES
                 (@kasir, @pelanggan, @paket, @berat, @total, @status)";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+
+                cmd.Parameters.AddWithValue("@kasir", txtk.Text);
+                cmd.Parameters.AddWithValue("@pelanggan", txtP.Text);
+                cmd.Parameters.AddWithValue("@paket", txtkp.Text);
