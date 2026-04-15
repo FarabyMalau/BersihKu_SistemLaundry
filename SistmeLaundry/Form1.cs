@@ -25,3 +25,8 @@ namespace SistmeLaundry
         {
             try
             {
+                if (txtth.Text == "" || txtb.Text == "")
+                {
+                    txtth.Text = "";
+                    return;
+                }
