@@ -20,3 +20,8 @@ namespace SistmeLaundry
         {
             txtth.ReadOnly = true;
         }
+
+        void HitungTotalHarga()
+        {
+            try
+            {
