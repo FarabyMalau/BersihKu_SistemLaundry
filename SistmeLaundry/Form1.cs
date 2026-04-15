@@ -7,7 +7,7 @@ namespace SistmeLaundry
 {
     public partial class p1 : Form
     {
-        
+
         private SqlConnection conn = new SqlConnection("Data Source=DZAKNERZ\\DATABASEABY;Initial Catalog=DBBersihKu;Integrated Security=True");
 
         public p1()
@@ -36,7 +36,7 @@ namespace SistmeLaundry
 
                 if (!int.TryParse(txtth.Text, out harga) || !int.TryParse(txtb.Text, out berat))
                 {
-                    txtth.Text = ""; 
+                    txtth.Text = "";
                     return;
                 }
 
@@ -93,7 +93,7 @@ namespace SistmeLaundry
                 if (result > 0)
                 {
                     MessageBox.Show("Berhasil disimpan");
-                    TampilkanNota(); 
+                    TampilkanNota();
                 }
                 else
                 {
@@ -105,3 +105,51 @@ namespace SistmeLaundry
                 MessageBox.Show("Error Database: " + ex.Message);
             }
         }
+
+        void TampilkanNota()
+        {
+            try
+            {
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
+
+                // [COMMIT 10] Mengambil 1 data terbaru yang barusan dimasukkan
+                string query = @"
+                SELECT TOP 1 * FROM Transaksi 
+                ORDER BY ID_Transaksi DESC";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                SqlDataReader r = cmd.ExecuteReader();
+
+                if (r.Read())
+                {
+                    // [COMMIT 11] Menyusun format tampilan teks Nota (Struk)
+                    txtNota.Text =
+                        "===== NOTA LAUNDRY =====\r\n\r\n" +
+                        "ID Transaksi : " + r["ID_Transaksi"] + "\r\n" +
+                        "Kasir        : " + r["Nama_Kasir"] + "\r\n" +
+                        "Pelanggan    : " + r["Nama_Pelanggan"] + "\r\n" +
+                        "Tanggal      : " + Convert.ToDateTime(r["Tanggal"]).ToString("dd/MM/yyyy") + "\r\n" +
+                        "Paket        : " + r["Kode_Paket"] + "\r\n" +
+                        "Berat        : " + r["Berat"] + " Kg\r\n" +
+                        "-----------------------------\r\n" +
+                        "TOTAL        : Rp " + r["Total_Harga"] + "\r\n" +
+                        "-----------------------------\r\n" +
+                        "Status       : " + r["Status_Laundry"] + "\r\n\r\n" +
+                        "Terima kasih 😊";
+                }
+
+                r.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error nota: " + ex.Message);
+            }
+        }
+
+        // Tombol untuk memanggil ulang nota terakhir (opsional)
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            TampilkanNota();
+        }
+    }
