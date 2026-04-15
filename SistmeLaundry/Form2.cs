@@ -91,3 +91,46 @@ namespace SistmeLaundry
                 MessageBox.Show("Gagal mengambil data: " + ex.Message);
             }
         }
+
+        private void btned_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Validasi: Harus pilih data di tabel dulu sebelum klik edit
+                if (idTerpilih == 0) { MessageBox.Show("Pilih data di tabel dulu!"); return; }
+
+                if (conn.State == ConnectionState.Closed) conn.Open();
+
+                // Query UPDATE berdasarkan ID yang sedang terpilih
+                string query = @"UPDATE Transaksi SET 
+                                Nama_Kasir = @kasir, 
+                                Nama_Pelanggan = @pelanggan, 
+                                Kode_Paket = @paket, 
+                                Berat = @berat, 
+                                Total_Harga = @total, 
+                                Status_Laundry = @status, 
+                                Tanggal = @tanggal 
+                                WHERE ID_Transaksi = @id";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@id", idTerpilih);
+                cmd.Parameters.AddWithValue("@kasir", txtk.Text);
+                cmd.Parameters.AddWithValue("@pelanggan", txtp.Text);
+                cmd.Parameters.AddWithValue("@paket", txtkp.Text);
+                cmd.Parameters.AddWithValue("@berat", decimal.Parse(txtb.Text));
+                cmd.Parameters.AddWithValue("@total", decimal.Parse(txth.Text));
+                cmd.Parameters.AddWithValue("@status", txts.Text);
+                cmd.Parameters.AddWithValue("@tanggal", dtmt.Value);
+
+                int result = cmd.ExecuteNonQuery();
+                if (result > 0)
+                {
+                    MessageBox.Show("Data berhasil diupdate");
+                    btnme.PerformClick(); // [COMMIT 5] Otomatis refresh tabel setelah update
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error update: " + ex.Message);
+            }
+        }
