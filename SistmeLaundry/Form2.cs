@@ -134,3 +134,32 @@ namespace SistmeLaundry
                 MessageBox.Show("Error update: " + ex.Message);
             }
         }
+
+        private void btnha_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (idTerpilih == 0) { MessageBox.Show("Pilih data di tabel dulu!"); return; }
+
+                // Menanyakan user sebelum benar-benar menghapus (Safe Delete)
+                DialogResult confirm = MessageBox.Show("Yakin ingin menghapus data ID " + idTerpilih + "?", "Konfirmasi", MessageBoxButtons.YesNo);
+                if (confirm == DialogResult.No) return;
+
+                if (conn.State == ConnectionState.Closed) conn.Open();
+
+                string query = "DELETE FROM Transaksi WHERE ID_Transaksi = @id";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@id", idTerpilih);
+
+                int result = cmd.ExecuteNonQuery();
+                if (result > 0)
+                {
+                    MessageBox.Show("Data berhasil dihapus");
+                    btnme.PerformClick(); // [COMMIT 5] Refresh tabel setelah hapus
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error delete: " + ex.Message);
+            }
+        }
