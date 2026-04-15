@@ -163,3 +163,13 @@ namespace SistmeLaundry
                 MessageBox.Show("Error delete: " + ex.Message);
             }
         }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            txtb.Clear(); txtk.Clear(); txtp.Clear();
+            txth.Clear(); txts.Clear(); txtkp.Clear();
+            dtmt.Value = DateTime.Now; // Kembalikan tanggal ke hari ini
+            idTerpilih = 0; // Reset ID terpilih agar tidak salah edit
+        }
+    }
+}
