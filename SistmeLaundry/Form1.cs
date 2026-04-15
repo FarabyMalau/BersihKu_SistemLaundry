@@ -49,3 +49,8 @@ namespace SistmeLaundry
                 txtth.Text = "";
             }
         }
+
+        private void txtHarga_TextChanged(object sender, EventArgs e)
+        {
+            HitungTotalHarga();
+        }
