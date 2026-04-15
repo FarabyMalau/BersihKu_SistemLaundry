@@ -84,3 +84,6 @@ namespace SistmeLaundry
                 cmd.Parameters.AddWithValue("@kasir", txtk.Text);
                 cmd.Parameters.AddWithValue("@pelanggan", txtP.Text);
                 cmd.Parameters.AddWithValue("@paket", txtkp.Text);
+                cmd.Parameters.AddWithValue("@berat", Convert.ToDecimal(txtb.Text));
+                cmd.Parameters.AddWithValue("@total", Convert.ToDecimal(txtth.Text));
+                cmd.Parameters.AddWithValue("@status", txts.Text);
