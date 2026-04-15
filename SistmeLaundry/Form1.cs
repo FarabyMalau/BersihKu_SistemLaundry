@@ -66,3 +66,9 @@ namespace SistmeLaundry
             {
                 if (conn.State == ConnectionState.Closed)
                     conn.Open();
+
+                if (txtP.Text == "" || txtk.Text == "" || txtkp.Text == "" || txtb.Text == "")
+                {
+                    MessageBox.Show("Data belum lengkap");
+                    return;
+                }
