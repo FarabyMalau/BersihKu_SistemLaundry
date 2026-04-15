@@ -7,8 +7,8 @@ namespace SistmeLaundry
 {
     public partial class p1 : Form
     {
-
-        private SqlConnection conn = new SqlConnection("Data Source=DZAKNERZ\\DATABASEABY;Initial Catalog=DBBersihKu;Integrated Security=True");
+        private SqlConnection conn =
+        new SqlConnection("Data Source=DZAKNERZ\\DATABASEABY;Initial Catalog=DBBersihKu;Integrated Security=True");
 
         public p1()
         {
@@ -20,6 +20,7 @@ namespace SistmeLaundry
         {
             txtth.ReadOnly = true;
         }
+
 
         void HitungTotalHarga()
         {
@@ -34,7 +35,9 @@ namespace SistmeLaundry
                 int harga;
                 int berat;
 
-                if (!int.TryParse(txtth.Text, out harga) || !int.TryParse(txtb.Text, out berat))
+
+                if (!int.TryParse(txtth.Text, out harga) ||
+                    !int.TryParse(txtb.Text, out berat))
                 {
                     txtth.Text = "";
                     return;
@@ -50,6 +53,7 @@ namespace SistmeLaundry
             }
         }
 
+
         private void txtHarga_TextChanged(object sender, EventArgs e)
         {
             HitungTotalHarga();
@@ -59,6 +63,7 @@ namespace SistmeLaundry
         {
             HitungTotalHarga();
         }
+
 
         private void btnInsert_Click(object sender, EventArgs e)
         {
@@ -102,9 +107,10 @@ namespace SistmeLaundry
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error Database: " + ex.Message);
+                MessageBox.Show(ex.Message);
             }
         }
+
 
         void TampilkanNota()
         {
@@ -113,9 +119,9 @@ namespace SistmeLaundry
                 if (conn.State == ConnectionState.Closed)
                     conn.Open();
 
-                // [COMMIT 10] Mengambil 1 data terbaru yang barusan dimasukkan
                 string query = @"
-                SELECT TOP 1 * FROM Transaksi 
+                SELECT TOP 1 * 
+                FROM Transaksi 
                 ORDER BY ID_Transaksi DESC";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -123,7 +129,6 @@ namespace SistmeLaundry
 
                 if (r.Read())
                 {
-                    // [COMMIT 11] Menyusun format tampilan teks Nota (Struk)
                     txtNota.Text =
                         "===== NOTA LAUNDRY =====\r\n\r\n" +
                         "ID Transaksi : " + r["ID_Transaksi"] + "\r\n" +
@@ -147,9 +152,10 @@ namespace SistmeLaundry
             }
         }
 
-        // Tombol untuk memanggil ulang nota terakhir (opsional)
+
         private void btnLoad_Click(object sender, EventArgs e)
         {
             TampilkanNota();
         }
     }
+}
