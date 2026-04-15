@@ -90,5 +90,8 @@
   <ItemGroup>
     <None Include="Resources\p1.jpg" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="DBbersihku.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
