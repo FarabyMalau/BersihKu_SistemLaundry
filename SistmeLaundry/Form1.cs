@@ -62,3 +62,7 @@ namespace SistmeLaundry
 
         private void btnInsert_Click(object sender, EventArgs e)
         {
+            try
+            {
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
