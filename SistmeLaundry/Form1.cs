@@ -54,3 +54,8 @@ namespace SistmeLaundry
         {
             HitungTotalHarga();
         }
+
+        private void txtb_TextChanged(object sender, EventArgs e)
+        {
+            HitungTotalHarga();
+        }
