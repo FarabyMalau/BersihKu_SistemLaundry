@@ -64,3 +64,30 @@ namespace SistmeLaundry
                 MessageBox.Show("Error load: " + ex.Message);
             }
         }
+
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                if (e.RowIndex >= 0)
+                {
+                    DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+
+                    // Menyimpan ID Transaksi untuk proses Update/Delete
+                    idTerpilih = Convert.ToInt32(row.Cells[0].Value);
+
+                    // Menampilkan kembali data dari tabel ke TextBox agar bisa diedit
+                    txtk.Text = row.Cells[1].Value.ToString();
+                    txtp.Text = row.Cells[2].Value.ToString();
+                    txtkp.Text = row.Cells[3].Value.ToString();
+                    txtb.Text = row.Cells[4].Value.ToString();
+                    txth.Text = row.Cells[5].Value.ToString();
+                    txts.Text = row.Cells[6].Value.ToString();
+                    dtmt.Value = Convert.ToDateTime(row.Cells[7].Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gagal mengambil data: " + ex.Message);
+            }
+        }
