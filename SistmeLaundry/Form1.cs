@@ -87,3 +87,21 @@ namespace SistmeLaundry
                 cmd.Parameters.AddWithValue("@berat", Convert.ToDecimal(txtb.Text));
                 cmd.Parameters.AddWithValue("@total", Convert.ToDecimal(txtth.Text));
                 cmd.Parameters.AddWithValue("@status", txts.Text);
+
+                int result = cmd.ExecuteNonQuery();
+
+                if (result > 0)
+                {
+                    MessageBox.Show("Berhasil disimpan");
+                    TampilkanNota(); 
+                }
+                else
+                {
+                    MessageBox.Show("Gagal simpan");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error Database: " + ex.Message);
+            }
+        }
