@@ -30,3 +30,22 @@ namespace SistmeLaundry
                     txtth.Text = "";
                     return;
                 }
+
+                int harga;
+                int berat;
+
+                if (!int.TryParse(txtth.Text, out harga) || !int.TryParse(txtb.Text, out berat))
+                {
+                    txtth.Text = ""; 
+                    return;
+                }
+
+                int total = harga * berat;
+
+                txtth.Text = total.ToString();
+            }
+            catch
+            {
+                txtth.Text = "";
+            }
+        }
