@@ -7,7 +7,7 @@ namespace SistmeLaundry
 {
     public partial class FormAdmin : Form
     {
-        // Pastikan Connection String sudah benar
+
         private SqlConnection conn = new SqlConnection("Data Source=DZAKNERZ\\DATABASEABY;Initial Catalog=DBBersihKu;Integrated Security=True");
 
         int idTerpilih;
@@ -17,9 +17,7 @@ namespace SistmeLaundry
             InitializeComponent();
         }
 
-        // ===============================
-        // LOAD DATA (READ)
-        // ===============================
+
         private void btnme_Click(object sender, EventArgs e)
         {
             try
@@ -29,15 +27,16 @@ namespace SistmeLaundry
                 dataGridView1.Rows.Clear();
                 dataGridView1.Columns.Clear();
 
-                // Urutan Kolom: 0 sd 7
-                dataGridView1.Columns.Add("ID", "ID");           // 0
-                dataGridView1.Columns.Add("Kasir", "Kasir");     // 1
-                dataGridView1.Columns.Add("Pelanggan", "Pelanggan"); // 2
-                dataGridView1.Columns.Add("Paket", "Paket");     // 3
-                dataGridView1.Columns.Add("Berat", "Berat");     // 4
-                dataGridView1.Columns.Add("Total", "Total");     // 5
-                dataGridView1.Columns.Add("Status", "Status");   // 6
-                dataGridView1.Columns.Add("Tanggal", "Tanggal"); // 7
+
+
+                dataGridView1.Columns.Add("ID", "ID");           
+                dataGridView1.Columns.Add("Kasir", "Kasir");     
+                dataGridView1.Columns.Add("Pelanggan", "Pelanggan"); 
+                dataGridView1.Columns.Add("Paket", "Paket");     
+                dataGridView1.Columns.Add("Berat", "Berat");     
+                dataGridView1.Columns.Add("Total", "Total");     
+                dataGridView1.Columns.Add("Status", "Status");  
+                dataGridView1.Columns.Add("Tanggal", "Tanggal"); 
 
                 string query = "SELECT * FROM Transaksi";
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -64,9 +63,7 @@ namespace SistmeLaundry
             }
         }
 
-        // ===============================
-        // AMBIL DATA SAAT DIKLIK (SINKRONKAN INDEKS)
-        // ===============================
+
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             try
@@ -75,17 +72,17 @@ namespace SistmeLaundry
                 {
                     DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
 
-                    // Ambil ID untuk query WHERE
+
                     idTerpilih = Convert.ToInt32(row.Cells[0].Value);
 
-                    // Isi TextBox sesuai urutan kolom di btnme_Click
-                    txtk.Text = row.Cells[1].Value.ToString(); // Kasir
-                    txtp.Text = row.Cells[2].Value.ToString(); // Pelanggan
-                    txtkp.Text = row.Cells[3].Value.ToString(); // Kode Paket
-                    txtb.Text = row.Cells[4].Value.ToString(); // Berat
-                    txth.Text = row.Cells[5].Value.ToString(); // Total Harga
-                    txts.Text = row.Cells[6].Value.ToString(); // Status
-                    dtmt.Value = Convert.ToDateTime(row.Cells[7].Value); // Tanggal
+
+                    txtk.Text = row.Cells[1].Value.ToString(); 
+                    txtp.Text = row.Cells[2].Value.ToString(); 
+                    txtkp.Text = row.Cells[3].Value.ToString(); 
+                    txtb.Text = row.Cells[4].Value.ToString(); 
+                    txth.Text = row.Cells[5].Value.ToString(); 
+                    txts.Text = row.Cells[6].Value.ToString(); 
+                    dtmt.Value = Convert.ToDateTime(row.Cells[7].Value); 
                 }
             }
             catch (Exception ex)
@@ -94,9 +91,7 @@ namespace SistmeLaundry
             }
         }
 
-        // ===============================
-        // UPDATE DATA
-        // ===============================
+
         private void btned_Click(object sender, EventArgs e)
         {
             try
@@ -120,8 +115,8 @@ namespace SistmeLaundry
                 cmd.Parameters.AddWithValue("@kasir", txtk.Text);
                 cmd.Parameters.AddWithValue("@pelanggan", txtp.Text);
                 cmd.Parameters.AddWithValue("@paket", txtkp.Text);
-                cmd.Parameters.AddWithValue("@berat", decimal.Parse(txtb.Text)); // Gunakan decimal
-                cmd.Parameters.AddWithValue("@total", decimal.Parse(txth.Text)); // Gunakan decimal
+                cmd.Parameters.AddWithValue("@berat", decimal.Parse(txtb.Text)); 
+                cmd.Parameters.AddWithValue("@total", decimal.Parse(txth.Text)); 
                 cmd.Parameters.AddWithValue("@status", txts.Text);
                 cmd.Parameters.AddWithValue("@tanggal", dtmt.Value);
 
@@ -129,7 +124,7 @@ namespace SistmeLaundry
                 if (result > 0)
                 {
                     MessageBox.Show("Data berhasil diupdate");
-                    btnme.PerformClick(); // Refresh tabel
+                    btnme.PerformClick(); 
                 }
                 else { MessageBox.Show("Gagal update: Data tidak ditemukan"); }
             }
@@ -139,9 +134,7 @@ namespace SistmeLaundry
             }
         }
 
-        // ===============================
-        // DELETE DATA
-        // ===============================
+        
         private void btnha_Click(object sender, EventArgs e)
         {
             try
@@ -161,7 +154,7 @@ namespace SistmeLaundry
                 if (result > 0)
                 {
                     MessageBox.Show("Data berhasil dihapus");
-                    btnme.PerformClick(); // Refresh tabel
+                    btnme.PerformClick(); 
                 }
                 else { MessageBox.Show("Gagal hapus"); }
             }
