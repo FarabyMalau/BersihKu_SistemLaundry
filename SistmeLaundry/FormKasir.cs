@@ -101,3 +101,32 @@ if (dtpT.Value.Year > DateTime.Now.Year)
     return;
 }
     }
+
+// ================= INSERT DATABASE =================
+if (conn.State == ConnectionState.Closed)
+    conn.Open();
+
+SqlCommand cmd = new SqlCommand("sp_InsertTransaksi", conn);
+cmd.CommandType = CommandType.StoredProcedure;
+
+cmd.Parameters.AddWithValue("@kasir", txtk.Text);
+cmd.Parameters.AddWithValue("@pelanggan", txtP.Text);
+cmd.Parameters.AddWithValue("@paket", txtkp.Text);
+cmd.Parameters.AddWithValue("@harga", harga);
+cmd.Parameters.AddWithValue("@berat", berat);
+cmd.Parameters.AddWithValue("@total", total);
+cmd.Parameters.AddWithValue("@status", txts.Text);
+cmd.Parameters.AddWithValue("@tanggal", dtpT.Value);
+
+int result = cmd.ExecuteNonQuery();
+
+if (result > 0)
+{
+    MessageBox.Show("Berhasil disimpan");
+}
+else
+{
+    MessageBox.Show("Gagal simpan");
+}
+
+conn.Close();
