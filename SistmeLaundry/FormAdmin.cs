@@ -79,3 +79,61 @@ private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         dtmt.Value = Convert.ToDateTime(row.Cells[8].Value);
     }
 }
+
+// ================= UPDATE =================
+private void btned_Click(object sender, EventArgs e)
+{
+    try
+    {
+        if (idTerpilih == 0)
+        {
+            MessageBox.Show("Pilih data dulu!");
+            return;
+        }
+
+        decimal harga, berat;
+
+        if (!decimal.TryParse(txth.Text, out harga) ||
+            !decimal.TryParse(txtb.Text, out berat))
+        {
+            MessageBox.Show("Harga & berat harus angka!");
+            return;
+        }
+
+        decimal total = harga * berat;
+
+        if (conn.State == ConnectionState.Closed)
+            conn.Open();
+
+        SqlCommand cmd = new SqlCommand("sp_UpdateTransaksi", conn);
+        cmd.CommandType = CommandType.StoredProcedure;
+
+        cmd.Parameters.AddWithValue("@id", idTerpilih);
+        cmd.Parameters.AddWithValue("@kasir", txtk.Text);
+        cmd.Parameters.AddWithValue("@pelanggan", txtp.Text);
+        cmd.Parameters.AddWithValue("@paket", txtkp.Text);
+        cmd.Parameters.AddWithValue("@harga", harga);
+        cmd.Parameters.AddWithValue("@berat", berat);
+        cmd.Parameters.AddWithValue("@total", total);
+        cmd.Parameters.AddWithValue("@status", txts.Text);
+        cmd.Parameters.AddWithValue("@tanggal", dtmt.Value);
+
+        int result = cmd.ExecuteNonQuery();
+
+        if (result > 0)
+        {
+            MessageBox.Show("Data berhasil diupdate");
+            LoadData();
+        }
+        else
+        {
+            MessageBox.Show("Gagal update");
+        }
+
+        conn.Close();
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("Error update: " + ex.Message);
+    }
+}
