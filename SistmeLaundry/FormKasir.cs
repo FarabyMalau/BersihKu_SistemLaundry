@@ -130,3 +130,16 @@ else
 }
 
 conn.Close();
+
+txtNota.Text =
+    "=============================== NOTA LAUNDRY =====================================\r\n\r\n" +
+    "Kasir        : " + txtk.Text + "\r\n" +
+    "Pelanggan    : " + txtP.Text + "\r\n" +
+    "Tanggal      : " + dtpT.Value.ToString("dd/MM/yyyy") + "\r\n" +
+    "Paket        : " + txtkp.Text + "\r\n" +
+    "Berat        : " + berat + " Kg\r\n" +
+    "-----------------------------\r\n" +
+    "TOTAL        : Rp " + total + "\r\n" +
+    "-----------------------------\r\n" +
+    "Status       : " + txts.Text + "\r\n\r\n" +
+    "Terima kasih 😊";
