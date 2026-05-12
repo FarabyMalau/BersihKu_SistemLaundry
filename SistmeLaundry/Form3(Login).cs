@@ -14,3 +14,12 @@ namespace SistmeLaundry
         {
             InitializeComponent();
         }
+
+        private void Form3_Login__Load(object sender, EventArgs e)
+        {
+            cmbRole.Items.Clear();
+            cmbRole.Items.Add("Admin");
+            cmbRole.Items.Add("Kasir");
+
+            txtPassword.UseSystemPasswordChar = true;
+        }
