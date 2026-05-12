@@ -97,3 +97,4 @@ select * from paket;
 
 DELETE FROM Transaksi
 WHERE ID_Transaksi IN (2,3,4,5,6);
+

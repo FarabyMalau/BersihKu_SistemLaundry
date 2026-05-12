@@ -16,7 +16,7 @@ namespace SistmeLaundry
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new p1());
+            Application.Run(new Form3_Login_());
         }
     }
 }
