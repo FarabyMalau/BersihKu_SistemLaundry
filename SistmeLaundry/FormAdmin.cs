@@ -60,3 +60,22 @@ private void btnme_Click(object sender, EventArgs e)
 {
     LoadData();
 }
+
+// ================= PILIH DATA =================
+private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+{
+    if (e.RowIndex >= 0)
+    {
+        DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+
+        idTerpilih = Convert.ToInt32(row.Cells[0].Value);
+
+        txtk.Text = row.Cells[1].Value.ToString();
+        txtp.Text = row.Cells[2].Value.ToString();
+        txtkp.Text = row.Cells[3].Value.ToString();
+        txth.Text = row.Cells[4].Value.ToString();
+        txtb.Text = row.Cells[5].Value.ToString();
+        txts.Text = row.Cells[7].Value.ToString();
+        dtmt.Value = Convert.ToDateTime(row.Cells[8].Value);
+    }
+}
