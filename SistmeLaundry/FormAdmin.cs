@@ -1,4 +1,5 @@
 ﻿// ================= LOAD DATA =================
+using SistmeLaundry;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -182,4 +183,83 @@ private void btnha_Click(object sender, EventArgs e)
     {
         MessageBox.Show("Error delete: " + ex.Message);
     }
+}
+
+// ================= CLEAR =================
+private void btnClear_Click(object sender, EventArgs e)
+{
+    txtb.Clear();
+    txtk.Clear();
+    txtp.Clear();
+    txth.Clear();
+    txts.Clear();
+    txtkp.Clear();
+
+    dtmt.Value = DateTime.Now;
+    idTerpilih = 0;
+}
+
+private void btnSearch_Click(object sender, EventArgs e)
+{
+    try
+    {
+        if (texSearch.Text.Trim() == "")
+        {
+            MessageBox.Show("Masukkan kata kunci pencarian!");
+            return;
+        }
+
+        if (conn.State == ConnectionState.Closed)
+            conn.Open();
+
+        dataGridView1.Rows.Clear();
+
+        SqlCommand cmd = new SqlCommand("sp_SearchTransaksi", conn);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.AddWithValue("@keyword", texSearch.Text);
+
+        SqlDataReader r = cmd.ExecuteReader();
+
+        while (r.Read())
+        {
+            dataGridView1.Rows.Add(
+                r["ID_Transaksi"],
+                r["Nama_Kasir"],
+                r["Nama_Pelanggan"],
+                r["Kode_Paket"],
+                r["Berat"],
+                r["Harga"],
+                r["Total_Harga"],
+                r["Status_Laundry"],
+                Convert.ToDateTime(r["Tanggal"]).ToShortDateString()
+            );
+        }
+
+        r.Close();
+        conn.Close();
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("Error search: " + ex.Message);
+    }
+}
+
+private void btnReset_Click(object sender, EventArgs e)
+{
+    texSearch.Clear();
+    LoadData();
+}
+
+// ================= LOGOUT =================
+private void btnLogout_Click(object sender, EventArgs e)
+{
+    Form3_Login_ login = new Form3_Login_();
+    login.Show();
+    this.Hide();
+}
+
+// ================= CLOSE =================
+private void FormAdmin_FormClosed(object sender, FormClosedEventArgs e)
+{
+    Application.Exit();
 }
