@@ -1,36 +1,272 @@
-﻿// ================= LOAD DATA =================
-using SistmeLaundry;
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Windows.Forms;
 
-private void LoadData()
+namespace SistmeLaundry
 {
-    try
+    public partial class FormAdmin : Form
     {
-        if (conn.State == ConnectionState.Closed)
-            conn.Open();
+        private SqlConnection conn = new SqlConnection("Data Source=DZAKNERZ\\DATABASEABY;Initial Catalog=DBBersihKu;Integrated Security=True");
 
-        dataGridView1.Rows.Clear();
-        dataGridView1.Columns.Clear();
+        int idTerpilih = 0;
 
-        dataGridView1.Columns.Add("ID", "ID");
-        dataGridView1.Columns.Add("Kasir", "Kasir");
-        dataGridView1.Columns.Add("Pelanggan", "Pelanggan");
-        dataGridView1.Columns.Add("Paket", "Paket");
-        dataGridView1.Columns.Add("Harga", "Harga");
-        dataGridView1.Columns.Add("Berat", "Berat");
-        dataGridView1.Columns.Add("Total", "Total");
-        dataGridView1.Columns.Add("Status", "Status");
-        dataGridView1.Columns.Add("Tanggal", "Tanggal");
-
-        using (SqlCommand cmd = new SqlCommand("SELECT * FROM v_Transaksi", conn))
+        public FormAdmin()
         {
-            cmd.CommandType = CommandType.Text;
+            InitializeComponent();
+        }
 
-            using (SqlDataReader r = cmd.ExecuteReader())
+        // ================= LOAD DATA =================
+        private void LoadData()
+        {
+            try
             {
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
+
+                dataGridView1.Rows.Clear();
+                dataGridView1.Columns.Clear();
+
+                dataGridView1.Columns.Add("ID", "ID");
+                dataGridView1.Columns.Add("Kasir", "Kasir");
+                dataGridView1.Columns.Add("Pelanggan", "Pelanggan");
+                dataGridView1.Columns.Add("Paket", "Paket");
+                dataGridView1.Columns.Add("Harga", "Harga");
+                dataGridView1.Columns.Add("Berat", "Berat");
+                dataGridView1.Columns.Add("Total", "Total");
+                dataGridView1.Columns.Add("Status", "Status");
+                dataGridView1.Columns.Add("Tanggal", "Tanggal");
+
+                using (SqlCommand cmd = new SqlCommand("SELECT * FROM v_Transaksi", conn))
+                {
+                    cmd.CommandType = CommandType.Text;
+
+                    using (SqlDataReader r = cmd.ExecuteReader())
+                    {
+                        while (r.Read())
+                        {
+                            dataGridView1.Rows.Add(
+                                r["ID_Transaksi"],
+                                r["Nama_Kasir"],
+                                r["Nama_Pelanggan"],
+                                r["Kode_Paket"],
+                                r["Harga"],
+                                r["Berat"],
+                                r["Total_Harga"],
+                                r["Status_Laundry"],
+                                Convert.ToDateTime(r["Tanggal"]).ToShortDateString()
+                            );
+                        }
+                    } // 🔥 reader otomatis close di sini
+                }
+
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error load: " + ex.Message);
+            }
+        }
+
+        // tombol tampil data
+        private void btnme_Click(object sender, EventArgs e)
+        {
+            LoadData();
+        }
+
+        // ================= PILIH DATA =================
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+
+                idTerpilih = Convert.ToInt32(row.Cells[0].Value);
+
+                txtk.Text = row.Cells[1].Value.ToString();
+                txtp.Text = row.Cells[2].Value.ToString();
+                txtkp.Text = row.Cells[3].Value.ToString();
+                txth.Text = row.Cells[4].Value.ToString(); // 🔥 HARGA
+                txtb.Text = row.Cells[5].Value.ToString();
+                txts.Text = row.Cells[7].Value.ToString();
+                dtmt.Value = Convert.ToDateTime(row.Cells[8].Value);
+            }
+        }
+
+        // ================= UPDATE =================
+        private void btned_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (idTerpilih == 0)
+                {
+                    MessageBox.Show("Pilih data dulu!");
+                    return;
+                }
+
+                // ================= VALIDASI KOSONG =================
+                if (txtk.Text == "" || txtp.Text == "" || txtkp.Text == "" || txtb.Text == "" || txth.Text == "")
+                {
+                    MessageBox.Show("Data belum lengkap!");
+                    return;
+                }
+
+                // ================= VALIDASI NAMA =================
+                if (!System.Text.RegularExpressions.Regex.IsMatch(txtp.Text, @"^[a-zA-Z\s]+$"))
+                {
+                    MessageBox.Show("Nama pelanggan tidak boleh simbol!");
+                    return;
+                }
+
+                if (!System.Text.RegularExpressions.Regex.IsMatch(txtk.Text, @"^[a-zA-Z\s]+$"))
+                {
+                    MessageBox.Show("Nama kasir tidak boleh simbol!");
+                    return;
+                }
+
+                // ================= VALIDASI ANGKA =================
+                decimal harga, berat;
+
+                if (!decimal.TryParse(txth.Text, out harga) ||
+                    !decimal.TryParse(txtb.Text, out berat))
+                {
+                    MessageBox.Show("Harga & berat harus angka!");
+                    return;
+                }
+
+                if (harga <= 0 || berat <= 0)
+                {
+                    MessageBox.Show("Tidak boleh minus atau nol!");
+                    return;
+                }
+
+                // ================= VALIDASI TANGGAL =================
+                if (dtmt.Value.Year > DateTime.Now.Year)
+                {
+                    MessageBox.Show("Tahun tidak boleh lebih dari sekarang!");
+                    return;
+                }
+
+                // ================= HITUNG TOTAL =================
+                decimal total = harga * berat;
+
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
+
+                SqlCommand cmd = new SqlCommand("sp_UpdateTransaksi", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@id", idTerpilih);
+                cmd.Parameters.AddWithValue("@kasir", txtk.Text);
+                cmd.Parameters.AddWithValue("@pelanggan", txtp.Text);
+                cmd.Parameters.AddWithValue("@paket", txtkp.Text);
+                cmd.Parameters.AddWithValue("@harga", harga); // 🔥 TAMBAH
+                cmd.Parameters.AddWithValue("@berat", berat);
+                cmd.Parameters.AddWithValue("@total", total);
+                cmd.Parameters.AddWithValue("@status", txts.Text);
+                cmd.Parameters.AddWithValue("@tanggal", dtmt.Value);
+
+                int result = cmd.ExecuteNonQuery();
+
+                if (result > 0)
+                {
+                    MessageBox.Show("Data berhasil diupdate");
+                    LoadData();
+                }
+                else
+                {
+                    MessageBox.Show("Gagal update");
+                }
+
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error update: " + ex.Message);
+            }
+        }
+
+        // ================= DELETE =================
+        private void btnha_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (idTerpilih == 0)
+                {
+                    MessageBox.Show("Pilih data dulu!");
+                    return;
+                }
+
+                DialogResult confirm = MessageBox.Show(
+                    "Yakin hapus ID " + idTerpilih + "?",
+                    "Konfirmasi",
+                    MessageBoxButtons.YesNo);
+
+                if (confirm == DialogResult.No) return;
+
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
+
+                SqlCommand cmd = new SqlCommand("sp_DeleteTransaksi", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@id", idTerpilih);
+
+                int result = cmd.ExecuteNonQuery();
+
+                if (result > 0)
+                {
+                    MessageBox.Show("Data berhasil dihapus");
+                    LoadData();
+                }
+                else
+                {
+                    MessageBox.Show("Gagal hapus");
+                }
+
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error delete: " + ex.Message);
+            }
+        }
+
+        // ================= CLEAR =================
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            txtb.Clear();
+            txtk.Clear();
+            txtp.Clear();
+            txth.Clear();
+            txts.Clear();
+            txtkp.Clear();
+
+            dtmt.Value = DateTime.Now;
+            idTerpilih = 0;
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (texSearch.Text.Trim() == "")
+                {
+                    MessageBox.Show("Masukkan kata kunci pencarian!");
+                    return;
+                }
+
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
+
+                dataGridView1.Rows.Clear();
+
+                SqlCommand cmd = new SqlCommand("sp_SearchTransaksi", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@keyword", texSearch.Text);
+
+                SqlDataReader r = cmd.ExecuteReader();
+
                 while (r.Read())
                 {
                     dataGridView1.Rows.Add(
@@ -38,228 +274,58 @@ private void LoadData()
                         r["Nama_Kasir"],
                         r["Nama_Pelanggan"],
                         r["Kode_Paket"],
-                        r["Harga"],
                         r["Berat"],
+                        r["Harga"],
                         r["Total_Harga"],
                         r["Status_Laundry"],
                         Convert.ToDateTime(r["Tanggal"]).ToShortDateString()
                     );
                 }
+
+                r.Close();
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error search: " + ex.Message);
             }
         }
 
-        conn.Close();
-    }
-    catch (Exception ex)
-    {
-        MessageBox.Show("Error load: " + ex.Message);
-    }
-}
-
-// tombol tampil data
-private void btnme_Click(object sender, EventArgs e)
-{
-    LoadData();
-}
-
-// ================= PILIH DATA =================
-private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
-{
-    if (e.RowIndex >= 0)
-    {
-        DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
-
-        idTerpilih = Convert.ToInt32(row.Cells[0].Value);
-
-        txtk.Text = row.Cells[1].Value.ToString();
-        txtp.Text = row.Cells[2].Value.ToString();
-        txtkp.Text = row.Cells[3].Value.ToString();
-        txth.Text = row.Cells[4].Value.ToString();
-        txtb.Text = row.Cells[5].Value.ToString();
-        txts.Text = row.Cells[7].Value.ToString();
-        dtmt.Value = Convert.ToDateTime(row.Cells[8].Value);
-    }
-}
-
-// ================= UPDATE =================
-private void btned_Click(object sender, EventArgs e)
-{
-    try
-    {
-        if (idTerpilih == 0)
+        private void btnReset_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Pilih data dulu!");
-            return;
+            texSearch.Clear();
+            LoadData(); // panggil method tampil semua data
         }
 
-        decimal harga, berat;
-
-        if (!decimal.TryParse(txth.Text, out harga) ||
-            !decimal.TryParse(txtb.Text, out berat))
+        // ================= LOGOUT =================
+        private void btnLogout_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Harga & berat harus angka!");
-            return;
+            Form3_Login_ login = new Form3_Login_();
+            login.Show();
+            this.Hide();
         }
 
-        decimal total = harga * berat;
-
-        if (conn.State == ConnectionState.Closed)
-            conn.Open();
-
-        SqlCommand cmd = new SqlCommand("sp_UpdateTransaksi", conn);
-        cmd.CommandType = CommandType.StoredProcedure;
-
-        cmd.Parameters.AddWithValue("@id", idTerpilih);
-        cmd.Parameters.AddWithValue("@kasir", txtk.Text);
-        cmd.Parameters.AddWithValue("@pelanggan", txtp.Text);
-        cmd.Parameters.AddWithValue("@paket", txtkp.Text);
-        cmd.Parameters.AddWithValue("@harga", harga);
-        cmd.Parameters.AddWithValue("@berat", berat);
-        cmd.Parameters.AddWithValue("@total", total);
-        cmd.Parameters.AddWithValue("@status", txts.Text);
-        cmd.Parameters.AddWithValue("@tanggal", dtmt.Value);
-
-        int result = cmd.ExecuteNonQuery();
-
-        if (result > 0)
+        // ================= CLOSE =================
+        private void FormAdmin_FormClosed(object sender, FormClosedEventArgs e)
         {
-            MessageBox.Show("Data berhasil diupdate");
-            LoadData();
-        }
-        else
-        {
-            MessageBox.Show("Gagal update");
+            Application.Exit();
         }
 
-        conn.Close();
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void FormAdmin_Load(object sender, EventArgs e)
+        {
+            // TODO: This line of code loads data into the 'dBBersihKuDataSet.Transaksi' table. You can move, or remove it, as needed.
+            this.transaksiTableAdapter.Fill(this.dBBersihKuDataSet.Transaksi);
+
+        }
     }
-    catch (Exception ex)
-    {
-        MessageBox.Show("Error update: " + ex.Message);
-    }
-}
-
-// ================= DELETE =================
-private void btnha_Click(object sender, EventArgs e)
-{
-    try
-    {
-        if (idTerpilih == 0)
-        {
-            MessageBox.Show("Pilih data dulu!");
-            return;
-        }
-
-        DialogResult confirm = MessageBox.Show(
-            "Yakin hapus ID " + idTerpilih + "?",
-            "Konfirmasi",
-            MessageBoxButtons.YesNo);
-
-        if (confirm == DialogResult.No) return;
-
-        if (conn.State == ConnectionState.Closed)
-            conn.Open();
-
-        SqlCommand cmd = new SqlCommand("sp_DeleteTransaksi", conn);
-        cmd.CommandType = CommandType.StoredProcedure;
-
-        cmd.Parameters.AddWithValue("@id", idTerpilih);
-
-        int result = cmd.ExecuteNonQuery();
-
-        if (result > 0)
-        {
-            MessageBox.Show("Data berhasil dihapus");
-            LoadData();
-        }
-        else
-        {
-            MessageBox.Show("Gagal hapus");
-        }
-
-        conn.Close();
-    }
-    catch (Exception ex)
-    {
-        MessageBox.Show("Error delete: " + ex.Message);
-    }
-}
-
-// ================= CLEAR =================
-private void btnClear_Click(object sender, EventArgs e)
-{
-    txtb.Clear();
-    txtk.Clear();
-    txtp.Clear();
-    txth.Clear();
-    txts.Clear();
-    txtkp.Clear();
-
-    dtmt.Value = DateTime.Now;
-    idTerpilih = 0;
-}
-
-private void btnSearch_Click(object sender, EventArgs e)
-{
-    try
-    {
-        if (texSearch.Text.Trim() == "")
-        {
-            MessageBox.Show("Masukkan kata kunci pencarian!");
-            return;
-        }
-
-        if (conn.State == ConnectionState.Closed)
-            conn.Open();
-
-        dataGridView1.Rows.Clear();
-
-        SqlCommand cmd = new SqlCommand("sp_SearchTransaksi", conn);
-        cmd.CommandType = CommandType.StoredProcedure;
-        cmd.Parameters.AddWithValue("@keyword", texSearch.Text);
-
-        SqlDataReader r = cmd.ExecuteReader();
-
-        while (r.Read())
-        {
-            dataGridView1.Rows.Add(
-                r["ID_Transaksi"],
-                r["Nama_Kasir"],
-                r["Nama_Pelanggan"],
-                r["Kode_Paket"],
-                r["Berat"],
-                r["Harga"],
-                r["Total_Harga"],
-                r["Status_Laundry"],
-                Convert.ToDateTime(r["Tanggal"]).ToShortDateString()
-            );
-        }
-
-        r.Close();
-        conn.Close();
-    }
-    catch (Exception ex)
-    {
-        MessageBox.Show("Error search: " + ex.Message);
-    }
-}
-
-private void btnReset_Click(object sender, EventArgs e)
-{
-    texSearch.Clear();
-    LoadData();
-}
-
-// ================= LOGOUT =================
-private void btnLogout_Click(object sender, EventArgs e)
-{
-    Form3_Login_ login = new Form3_Login_();
-    login.Show();
-    this.Hide();
-}
-
-// ================= CLOSE =================
-private void FormAdmin_FormClosed(object sender, FormClosedEventArgs e)
-{
-    Application.Exit();
 }
