@@ -187,3 +187,28 @@ private void btnLoad_Click(object sender, EventArgs e)
 {
     TampilkanNota();
 }
+
+// ================= PINDAH FORM =================
+private void button1_Click(object sender, EventArgs e)
+{
+    FormAdmin adminForm = new FormAdmin();
+    adminForm.Show();
+    this.Hide();
+}
+
+private void btnLogout_Click(object sender, EventArgs e)
+{
+    Form3_Login_ login = new Form3_Login_();
+    login.Show();
+    this.Hide();
+}
+
+private void p1_FormClosed(object sender, FormClosedEventArgs e)
+{
+    Application.Exit();
+}
+
+private void txtk_TextChanged(object sender, EventArgs e)
+{
+
+}
