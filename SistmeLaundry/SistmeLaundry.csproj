@@ -51,7 +51,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DBBersihKuDataSet.xsd</DependentUpon>
     </Compile>
-    <Compile Include="FormKasir.cs" />
+    <Compile Include="FormKasir.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FormKasir.Designer.cs">
       <DependentUpon>FormKasir.cs</DependentUpon>
     </Compile>
