@@ -143,3 +143,47 @@ txtNota.Text =
     "-----------------------------\r\n" +
     "Status       : " + txts.Text + "\r\n\r\n" +
     "Terima kasih 😊";
+
+// ================= NOTA =================
+void TampilkanNota()
+{
+    try
+    {
+        if (conn.State == ConnectionState.Closed)
+            conn.Open();
+
+        SqlCommand cmd = new SqlCommand("v_Transaksi", conn);
+        cmd.CommandType = CommandType.StoredProcedure;
+
+        SqlDataReader r = cmd.ExecuteReader();
+
+        if (r.Read())
+        {
+            txtNota.Text =
+                "===== NOTA LAUNDRY =====\r\n\r\n" +
+                "ID Transaksi : " + r["ID_Transaksi"] + "\r\n" +
+                "Kasir        : " + r["Nama_Kasir"] + "\r\n" +
+                "Pelanggan    : " + r["Nama_Pelanggan"] + "\r\n" +
+                "Tanggal      : " + Convert.ToDateTime(r["Tanggal"]).ToString("dd/MM/yyyy") + "\r\n" +
+                "Paket        : " + r["Kode_Paket"] + "\r\n" +
+                "Berat        : " + r["Berat"] + " Kg\r\n" +
+                "-----------------------------\r\n" +
+                "TOTAL        : Rp " + r["Total_Harga"] + "\r\n" +
+                "-----------------------------\r\n" +
+                "Status       : " + r["Status_Laundry"] + "\r\n\r\n" +
+                "Terima kasih 😊";
+        }
+
+        r.Close();
+        conn.Close();
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("Error nota: " + ex.Message);
+    }
+}
+
+private void btnLoad_Click(object sender, EventArgs e)
+{
+    TampilkanNota();
+}
