@@ -23,3 +23,58 @@ namespace SistmeLaundry
 
             txtPassword.UseSystemPasswordChar = true;
         }
+
+        private void btnLogin_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                conn.Open();
+                SqlCommand cmd;
+                if (cmbRole.Text == "Admin")
+                {
+                    cmd = new SqlCommand("sp_LoginAdmin", conn);
+                }
+                else
+                {
+                    cmd = new SqlCommand("sp_LoginKasir", conn);
+                }
+
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@username", txtUsername.Text);
+                cmd.Parameters.AddWithValue("@password", txtPassword.Text);
+
+                SqlDataReader rd = cmd.ExecuteReader();
+
+                if (rd.HasRows)
+
+                {
+                    MessageBox.Show("Login Berhasil");
+
+                    if (cmbRole.Text == "Admin")
+                    {
+                        FormAdmin frm = new FormAdmin();
+                        frm.Show();
+                    }
+                    else
+                    {
+                        p1 frm = new p1();
+                        frm.Show();
+                    }
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show("Login Gagal, pastikan username, password, dan role benar!");
+                }
+                conn.Close();
+
+            }
+            catch (Exception ex)
+            {
+                {
+                    MessageBox.Show("Error: " + ex.Message);
+                }
+            }
+        }
+    }
+}
