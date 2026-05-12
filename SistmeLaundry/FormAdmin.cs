@@ -137,3 +137,49 @@ private void btned_Click(object sender, EventArgs e)
         MessageBox.Show("Error update: " + ex.Message);
     }
 }
+
+// ================= DELETE =================
+private void btnha_Click(object sender, EventArgs e)
+{
+    try
+    {
+        if (idTerpilih == 0)
+        {
+            MessageBox.Show("Pilih data dulu!");
+            return;
+        }
+
+        DialogResult confirm = MessageBox.Show(
+            "Yakin hapus ID " + idTerpilih + "?",
+            "Konfirmasi",
+            MessageBoxButtons.YesNo);
+
+        if (confirm == DialogResult.No) return;
+
+        if (conn.State == ConnectionState.Closed)
+            conn.Open();
+
+        SqlCommand cmd = new SqlCommand("sp_DeleteTransaksi", conn);
+        cmd.CommandType = CommandType.StoredProcedure;
+
+        cmd.Parameters.AddWithValue("@id", idTerpilih);
+
+        int result = cmd.ExecuteNonQuery();
+
+        if (result > 0)
+        {
+            MessageBox.Show("Data berhasil dihapus");
+            LoadData();
+        }
+        else
+        {
+            MessageBox.Show("Gagal hapus");
+        }
+
+        conn.Close();
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("Error delete: " + ex.Message);
+    }
+}
