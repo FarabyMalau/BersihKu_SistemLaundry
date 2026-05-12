@@ -20,4 +20,39 @@ namespace SistmeLaundry
             txtth.ReadOnly = true;
         }
     }
-}
+
+
+    // ================= HITUNG TOTAL =================
+void HitungTotalHarga()
+        {
+            try
+            {
+                decimal harga, berat;
+
+                if (decimal.TryParse(txtth.Text, out harga) &&
+                    decimal.TryParse(txtb.Text, out berat))
+                {
+                    decimal total = harga * berat;
+                    txtth.Text = total.ToString();
+                }
+                else
+                {
+                    txtth.Text = "";
+                }
+            }
+            catch
+            {
+                txtth.Text = "";
+            }
+        }
+
+        private void txtHarga_TextChanged(object sender, EventArgs e)
+        {
+            HitungTotalHarga();
+        }
+
+        private void txtb_TextChanged(object sender, EventArgs e)
+        {
+            HitungTotalHarga();
+        }
+    }
