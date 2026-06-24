@@ -7,41 +7,34 @@ namespace SistmeLaundry
 {
     public partial class p1 : Form
     {
-        private SqlConnection conn =
-        new SqlConnection("Data Source=DZAKNERZ\\DATABASEABY;Initial Catalog=DBBersihKu;Integrated Security=True");
+        DAL dbLogic = new DAL();
+        private SqlConnection conn = new SqlConnection(DAL.GetConnectionString());
 
-        public p1()
+        public p1(string nm)
         {
             InitializeComponent();
+            txtk.Text = nm;
+            txtk.Enabled = false;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            txtth.ReadOnly = true;
         }
 
-        // ================= HITUNG TOTAL =================
         void HitungTotalHarga()
         {
             try
             {
                 decimal harga, berat;
 
-                // 🔥 ambil dari txtHarga, bukan txtth
                 if (decimal.TryParse(txtth.Text, out harga) &&
                     decimal.TryParse(txtb.Text, out berat))
                 {
                     decimal total = harga * berat;
-                    txtth.Text = total.ToString();
-                }
-                else
-                {
-                    txtth.Text = "";
                 }
             }
             catch
             {
-                txtth.Text = "";
             }
         }
 
@@ -55,19 +48,17 @@ namespace SistmeLaundry
             HitungTotalHarga();
         }
 
-        // ================= INSERT =================
+
         private void btnInsert_Click(object sender, EventArgs e)
         {
             try
             {
-                // ================= VALIDASI KOSONG =================
                 if (txtP.Text == "" || txtk.Text == "" || txtkp.Text == "" || txtb.Text == "" || txtth.Text == "")
                 {
                     MessageBox.Show("Data belum lengkap");
                     return;
                 }
 
-                // ================= VALIDASI NAMA =================
                 if (!System.Text.RegularExpressions.Regex.IsMatch(txtP.Text, @"^[a-zA-Z\s]+$"))
                 {
                     MessageBox.Show("Nama pelanggan tidak boleh mengandung simbol!");
@@ -80,7 +71,6 @@ namespace SistmeLaundry
                     return;
                 }
 
-                // ================= VALIDASI ANGKA =================
                 decimal harga, berat;
 
                 if (!decimal.TryParse(txtth.Text, out harga) ||
@@ -90,73 +80,100 @@ namespace SistmeLaundry
                     return;
                 }
 
-                // ================= VALIDASI TIDAK BOLEH MINUS =================
                 if (harga <= 0 || berat <= 0)
                 {
                     MessageBox.Show("Harga dan berat tidak boleh nol atau minus!");
                     return;
                 }
 
-                // ================= VALIDASI TANGGAL =================
                 if (dtpT.Value.Year > DateTime.Now.Year)
                 {
                     MessageBox.Show("Tahun tidak boleh lebih dari sekarang!");
                     return;
                 }
 
-                // ================= HITUNG TOTAL OTOMATIS =================
                 decimal total = harga * berat;
 
-                // ================= INSERT DATABASE =================
                 if (conn.State == ConnectionState.Closed)
                     conn.Open();
 
-                SqlCommand cmd = new SqlCommand("sp_InsertTransaksi", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@kasir", txtk.Text);
-                cmd.Parameters.AddWithValue("@pelanggan", txtP.Text);
-                cmd.Parameters.AddWithValue("@paket", txtkp.Text);
-                cmd.Parameters.AddWithValue("@harga", harga);
-                cmd.Parameters.AddWithValue("@berat", berat);
-                cmd.Parameters.AddWithValue("@total", total);
-                cmd.Parameters.AddWithValue("@status", txts.Text);
-                cmd.Parameters.AddWithValue("@tanggal", dtpT.Value);
+                SqlTransaction trans = conn.BeginTransaction();
 
-                int result = cmd.ExecuteNonQuery();
-
-                if (result > 0)
+                try
                 {
-                    MessageBox.Show("Berhasil disimpan");
+                    int result = 0;
 
-                    // ================= TAMPILKAN NOTA =================
-                    txtNota.Text =
-                        "=============================== NOTA LAUNDRY =====================================\r\n\r\n" +
-                        "Kasir        : " + txtk.Text + "\r\n" +
-                        "Pelanggan    : " + txtP.Text + "\r\n" +
-                        "Tanggal      : " + dtpT.Value.ToString("dd/MM/yyyy") + "\r\n" +
-                        "Paket        : " + txtkp.Text + "\r\n" +
-                        "Berat        : " + berat + " Kg\r\n" +
-                        "-----------------------------\r\n" +
-                        "TOTAL        : Rp " + total + "\r\n" +
-                        "-----------------------------\r\n" +
-                        "Status       : " + txts.Text + "\r\n\r\n" +
-                        "Terima kasih 😊";
+                    using (SqlCommand cmd = new SqlCommand("sp_InsertTransaksi", conn, trans))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.AddWithValue("@kasir", txtk.Text);
+                        cmd.Parameters.AddWithValue("@pelanggan", txtP.Text);
+                        cmd.Parameters.AddWithValue("@paket", txtkp.Text);
+                        cmd.Parameters.AddWithValue("@harga", harga);
+                        cmd.Parameters.AddWithValue("@berat", berat);
+                        cmd.Parameters.AddWithValue("@total", total);
+                        cmd.Parameters.AddWithValue("@status", txts.Text);
+                        cmd.Parameters.AddWithValue("@tanggal", dtpT.Value);
+
+                        result = cmd.ExecuteNonQuery();
+                    }
+
+
+                    string queryLogBackup = "INSERT INTO LogAktivitas (Aktivitas, Waktu) VALUES (@txt, GETDATE())";
+                    using (SqlCommand cmdLog = new SqlCommand(queryLogBackup, conn, trans))
+                    {
+                        cmdLog.Parameters.AddWithValue("@txt", "LOG BACKEND C#: Sukses memproses transaksi laundry untuk " + txtP.Text);
+                        cmdLog.ExecuteNonQuery();
+                    }
+
+                    trans.Commit();
+
+                    if (result > 0)
+                    {
+                        MessageBox.Show("Data transaksi dan log audit berhasil disimpan ke sistem!", "Sukses UCP 3", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        txtNota.Text =
+                            "=============================== NOTA LAUNDRY =====================================\r\n\r\n" +
+                            "Kasir        : " + txtk.Text + "\r\n" +
+                            "Pelanggan    : " + txtP.Text + "\r\n" +
+                            "Tanggal      : " + dtpT.Value.ToString("dd/MM/yyyy") + "\r\n" +
+                            "Paket        : " + txtkp.Text + "\r\n" +
+                            "Berat        : " + berat + " Kg\r\n" +
+                            "-----------------------------\r\n" +
+                            "TOTAL        : Rp " + total + "\r\n" +
+                            "-----------------------------\r\n" +
+                            "Status       : " + txts.Text + "\r\n\r\n" +
+                            "Terima kasih 😊";
+                    }
+                    else
+                    {
+                        MessageBox.Show("Gagal simpan data transaksi.");
+                    }
                 }
-                else
+                catch (SqlException sqlEx)
                 {
-                    MessageBox.Show("Gagal simpan");
+                    trans.Rollback();
+                    MessageBox.Show("Gagal menyimpan ke database (Mekanisme ROLLBACK diaktifkan): \nError: " + sqlEx.Message, "SqlException " + sqlEx.Number, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                conn.Close();
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    MessageBox.Show("Terjadi kesalahan runtime aplikasi (ROLLBACK diaktifkan): \nError: " + ex.Message, "Error Aplikasi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open)
+                        conn.Close();
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error insert: " + ex.Message);
+                MessageBox.Show("Error luar sistem: " + ex.Message);
             }
         }
 
-        // ================= NOTA =================
         void TampilkanNota()
         {
             try
@@ -164,8 +181,8 @@ namespace SistmeLaundry
                 if (conn.State == ConnectionState.Closed)
                     conn.Open();
 
-                SqlCommand cmd = new SqlCommand("v_Transaksi", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
+                SqlCommand cmd = new SqlCommand("SELECT TOP 1 * FROM v_Transaksi ORDER BY ID_Transaksi DESC", conn);
+                cmd.CommandType = CommandType.Text;
 
                 SqlDataReader r = cmd.ExecuteReader();
 
@@ -200,7 +217,6 @@ namespace SistmeLaundry
             TampilkanNota();
         }
 
-        // ================= PINDAH FORM =================
         private void button1_Click(object sender, EventArgs e)
         {
             FormAdmin adminForm = new FormAdmin();

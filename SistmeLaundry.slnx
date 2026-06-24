@@ -1,3 +1,9 @@
 <Solution>
-  <Project Path="SistmeLaundry/SistmeLaundry.csproj" Id="5e5cbcfb-438b-4c6a-957b-e4b5a5a9b720" />
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="SistmeLaundry/SistmeLaundry.csproj" Id="5e5cbcfb-438b-4c6a-957b-e4b5a5a9b720">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
 </Solution>

@@ -7,8 +7,8 @@ namespace SistmeLaundry
 {
     public partial class Form3_Login_ : Form
     {
-        private SqlConnection conn =
-       new SqlConnection("Data Source=DZAKNERZ\\DATABASEABY;Initial Catalog=DBBersihKu;Integrated Security=True");
+        DAL dbLogic = new DAL();
+        private SqlConnection conn = new SqlConnection(DAL.GetConnectionString());
 
         public Form3_Login_()
         {
@@ -57,7 +57,7 @@ namespace SistmeLaundry
                     }
                     else
                     {
-                        p1 frm = new p1();
+                        p1 frm = new p1(txtUsername.Text); 
                         frm.Show();
                     }
                     this.Hide();
