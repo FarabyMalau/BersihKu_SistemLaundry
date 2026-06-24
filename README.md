@@ -1,17 +1,21 @@
 # Sistem Laundry BersihKu
 
 ### Screenshot Aplikasi
-#### 1. Form Input Data & Koneksi
-<img width="996" height="747" alt="image" src="https://github.com/user-attachments/assets/2beb035e-8bfc-4ab0-9429-e99a097b9524" />
+#### 1. Form Login
+<img width="1061" height="548" alt="image" src="https://github.com/user-attachments/assets/6000fa70-29ca-4038-b26b-387c629ceaa7" />
 
+#### 2. Form Input Data & Koneksi (kasir)
+<img width="1132" height="745" alt="image" src="https://github.com/user-attachments/assets/221e0bff-3d2a-4904-aa05-85d0dc0fba1d" />
 
-#### 2. Form Riwayat Transaksi (Admin)
-<img width="826" height="733" alt="image" src="https://github.com/user-attachments/assets/20cd92e1-b3d2-4d16-abb3-89b7977933e9" />
+#### 3. Form Riwayat Transaksi (Admin)
+<img width="1316" height="722" alt="image" src="https://github.com/user-attachments/assets/f0a0558c-b39c-497d-bdf9-6d9cc76e9ee9" />
 
+#### 4. Bukti Operasi (CRUD)
+* **Tambah Data:** <img width="1136" height="758" alt="image" src="https://github.com/user-attachments/assets/8f32b821-f7fb-4e75-8233-5fff9432d32c" />
 
-#### 3. Bukti Operasi (CRUD)
-* **Tambah Data:** <img width="997" height="748" alt="image" src="https://github.com/user-attachments/assets/88d71611-662a-441c-817e-f376e07f4ff1" />
+* **Update Data:** <img width="1342" height="747" alt="image" src="https://github.com/user-attachments/assets/4e2e5049-7b32-46b6-b613-d807eae77d59" />
 
-* **Update Data:** <img width="964" height="752" alt="image" src="https://github.com/user-attachments/assets/d01d3b3b-6770-49c5-aad9-3ee168fff2e5" />
+* **Hapus Data:** <img width="1327" height="727" alt="image" src="https://github.com/user-attachments/assets/7fb75340-74fe-4ed7-9934-18a73a7e133f" />
 
-* **Hapus Data:** <img width="1025" height="743" alt="image" src="https://github.com/user-attachments/assets/43fa7c44-bc7e-415f-af03-ebe154654e1a" />
+### 5. Alur SQL Injection:
+Sistem login ini aman dari SQL Injection karena menggunakan Stored Procedure dan Parameterized Query, di mana input pengguna dipisahkan dari logika perintah SQL dan diperlakukan murni sebagai data biasa (string). Dengan metode ini, karakter berbahaya seperti ' OR 1=1 -- tidak akan dieksekusi oleh database, sehingga struktur query tetap terjaga dan upaya manipulasi autentikasi dapat dicegah secara efektif.
